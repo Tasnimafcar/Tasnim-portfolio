@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { ExternalLink, Mail, Terminal, GitCommit, Menu, X } from "lucide-react";
+import emailjs from "@emailjs/browser";
 import {
   SiReact,
   SiNodedotjs,
@@ -27,6 +28,10 @@ const FONT_IMPORT = `
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
 @keyframes spin-border {
   to { transform: rotate(360deg); }
+  @keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
 }
 .skill-stagger-1 { margin-top: 0; }
 .skill-stagger-2 { margin-top: 0; }
@@ -46,18 +51,20 @@ const PROJECTS = [
   {
     hash: "a3f9c2d",
     name: "Feni Blood Donors Society",
-    desc: "A real-time blood donor finder built for my home district. Handles donor registration, authentication, session management, and live filtering so people can find a match fast when it matters most.",
+    desc: "...",
     tags: ["React", "Supabase", "Vercel", "Auth"],
     live: "https://feni-blood-donors-society-26.vercel.app/",
     status: "deployed",
+    image: "/feni blood donners society.png",
   },
   {
     hash: "f18b6e4",
     name: "AI Model Hub",
-    desc: "A subscription-style AI model marketplace with an animated cart, portal-based mobile navigation, and a typewriter hero. Built to practice production-grade UI patterns end to end.",
+    desc: "...",
     tags: ["React", "Tailwind v4", "Framer Motion", "DaisyUI"],
     live: "https://ai-model-hub-4l76.vercel.app/",
     status: "deployed",
+    image: "/Ai model hub.png",
   },
 ];
 
@@ -324,6 +331,38 @@ export default function Portfolio() {
   const [showIntro, setShowIntro] = useState(true);
   const [siteRevealed, setSiteRevealed] = useState(false);
 
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [formStatus, setFormStatus] = useState("idle"); // idle | sending | sent | error
+
+  const handleFormChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFormSubmit = (e) => {
+    e.preventDefault();
+    setFormStatus("sending");
+
+    emailjs
+      .send(
+        "service_2t10d7s",
+        "template_7xhcs4g",
+        {
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          time: new Date().toLocaleString(),
+        },
+        "AojApm9y5hb3BVGXc"
+      )
+      .then(() => {
+        setFormStatus("sent");
+        setFormData({ name: "", email: "", message: "" });
+      })
+      .catch(() => {
+        setFormStatus("error");
+      });
+  };
+
   const bootLines = [
     "$ whoami",
     "> Tasnim — MERN Stack Developer, Feni, Bangladesh",
@@ -424,6 +463,25 @@ export default function Portfolio() {
 
         {/* HERO */}
         < section className="max-w-5xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32" >
+
+          <div
+            className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full"
+            style={{ border: `1px solid ${COLORS.line}`, background: COLORS.surface }}
+          >
+            <span className="relative flex h-2 w-2">
+              <span
+                className="absolute inline-flex h-full w-full rounded-full"
+                style={{ background: COLORS.accent, animation: "pulse-dot 2s ease-in-out infinite" }}
+              />
+            </span>
+            <span
+              className="text-xs"
+              style={{ fontFamily: "'IBM Plex Mono', monospace", color: COLORS.muted }}
+            >
+              Available for freelance work
+            </span>
+          </div>
+
           <div
             style={{ background: COLORS.surface, border: `1px solid ${COLORS.line}` }}
             className="rounded-lg overflow-hidden max-w-2xl"
@@ -613,6 +671,17 @@ export default function Portfolio() {
                       <h3 style={{ fontFamily: "'Space Grotesk', sans-serif" }} className="text-2xl md:text-3xl font-semibold mb-3">
                         {p.name}
                       </h3>
+                      <div
+                        className="mb-4 rounded-lg overflow-hidden max-w-xl"
+                        style={{ border: `1px solid ${COLORS.line}` }}
+                      >
+                        <img
+                          src={p.image}
+                          alt={`${p.name} screenshot`}
+                          className="w-full h-auto block"
+                          loading="lazy"
+                        />
+                      </div>
                       <p className="text-sm md:text-base max-w-xl mb-4" style={{ color: COLORS.muted }}>
                         {p.desc}
                       </p>
@@ -661,13 +730,75 @@ export default function Portfolio() {
                 Have a project in mind? I'm currently open for freelance and
                 contract work.
               </p>
-              <a
-                href="mailto:your.email@example.com"
-                style={{ background: COLORS.paper, color: COLORS.ink }}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
-              >
-                <Mail size={16} /> tasnimafsar123@gmail.com
-              </a>
+              <div className="flex flex-wrap justify-center gap-4">
+                <a
+                  href="mailto:tasnimafsar123@gmail.com"
+                  style={{ background: COLORS.paper, color: COLORS.ink }}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
+                >
+                  <Mail size={16} /> tasnimafsar123@gmail.com
+                </a>
+
+                <a
+                  href="/Tasnim_Afsar_Resume.pdf"
+                  download
+                  style={{ border: `1px solid ${COLORS.line}`, color: COLORS.paper }}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-md text-sm font-medium hover:border-[#45C7A6] transition-colors"
+                >
+                  Download Resume
+                </a>
+              </div>
+              <form onSubmit={handleFormSubmit} className="mt-10 max-w-md mx-auto text-left space-y-4">
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Your name"
+                  value={formData.name}
+                  onChange={handleFormChange}
+                  required
+                  className="w-full px-4 py-3 rounded-md text-sm"
+                  style={{ background: COLORS.surfaceAlt, border: `1px solid ${COLORS.line}`, color: COLORS.paper }}
+                />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Your email"
+                  value={formData.email}
+                  onChange={handleFormChange}
+                  required
+                  className="w-full px-4 py-3 rounded-md text-sm"
+                  style={{ background: COLORS.surfaceAlt, border: `1px solid ${COLORS.line}`, color: COLORS.paper }}
+                />
+                <textarea
+                  name="message"
+                  placeholder="Your message"
+                  value={formData.message}
+                  onChange={handleFormChange}
+                  required
+                  rows={4}
+                  className="w-full px-4 py-3 rounded-md text-sm resize-none"
+                  style={{ background: COLORS.surfaceAlt, border: `1px solid ${COLORS.line}`, color: COLORS.paper }}
+                />
+                <button
+                  type="submit"
+                  disabled={formStatus === "sending"}
+                  style={{ background: COLORS.paper, color: COLORS.ink }}
+                  className="w-full px-6 py-3 rounded-md text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                >
+                  {formStatus === "sending" ? "Sending..." : "Send message"}
+                </button>
+
+                {formStatus === "sent" && (
+                  <p className="text-sm text-center" style={{ color: COLORS.accent }}>
+                    Message sent — I'll get back to you soon.
+                  </p>
+                )}
+                {formStatus === "error" && (
+                  <p className="text-sm text-center" style={{ color: COLORS.signal }}>
+                    Something went wrong. Try emailing me directly.
+                  </p>
+                )}
+              </form>
             </div>
           </Reveal>
         </section >
@@ -675,7 +806,7 @@ export default function Portfolio() {
         <footer className="max-w-5xl mx-auto px-6 pb-10 text-center text-xs" style={{ color: COLORS.mutedDim }}>
           Built with React & Tailwind — Tasnim, {new Date().getFullYear()}
         </footer>
-      </div>
+      </div >
     </div >
   );
 }
