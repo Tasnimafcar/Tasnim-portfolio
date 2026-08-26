@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { ExternalLink, Mail, Terminal, GitCommit, Menu, X } from "lucide-react";
+import { ExternalLink, Mail, Phone, Terminal, GitCommit, Menu, X } from "lucide-react";
 import emailjs from "@emailjs/browser";
 import {
   SiReact,
@@ -28,10 +28,10 @@ const FONT_IMPORT = `
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap');
 @keyframes spin-border {
   to { transform: rotate(360deg); }
-  @keyframes pulse-dot {
+}
+@keyframes pulse-dot {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(1.3); }
-}
 }
 .skill-stagger-1 { margin-top: 0; }
 .skill-stagger-2 { margin-top: 0; }
@@ -51,7 +51,7 @@ const PROJECTS = [
   {
     hash: "a3f9c2d",
     name: "Feni Blood Donors Society",
-    desc: "...",
+    desc: "A real-time blood donor finder built for my home district. Handles donor registration, authentication, session management, and live filtering so people can find a match fast when it matters most.",
     tags: ["React", "Supabase", "Vercel", "Auth"],
     live: "https://feni-blood-donors-society-26.vercel.app/",
     status: "deployed",
@@ -60,7 +60,7 @@ const PROJECTS = [
   {
     hash: "f18b6e4",
     name: "AI Model Hub",
-    desc: "...",
+    desc: "A subscription-style AI model marketplace with an animated cart, portal-based mobile navigation, and a typewriter hero. Built to practice production-grade UI patterns end to end.",
     tags: ["React", "Tailwind v4", "Framer Motion", "DaisyUI"],
     live: "https://ai-model-hub-4l76.vercel.app/",
     status: "deployed",
@@ -89,7 +89,6 @@ function useIntroPositions(count) {
       const angle = (i / count) * Math.PI * 2 - Math.PI / 2;
       const restX = Math.cos(angle) * RING_RADIUS;
       const restY = Math.sin(angle) * RING_RADIUS;
-      // start further out, along the same angle, so balls fly in from outside
       const startDist = 500 + Math.random() * 260;
       const jitter = (Math.random() - 0.5) * 0.6;
       const startAngle = angle + jitter;
@@ -102,7 +101,7 @@ function useIntroPositions(count) {
 }
 
 function IntroScreen({ onComplete }) {
-  const [phase, setPhase] = useState("start"); // start -> enter -> converge -> blast -> exit
+  const [phase, setPhase] = useState("start");
   const positions = useIntroPositions(INTRO_BALLS.length);
   const skippedRef = useRef(false);
 
@@ -135,9 +134,14 @@ function IntroScreen({ onComplete }) {
         opacity: exiting ? 0 : 1,
         transition: "opacity 0.55s ease",
         pointerEvents: exiting ? "none" : "auto",
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        width: "100%",
+        margin: 0,
       }}
     >
-      {/* subtle grid backdrop */}
       <div
         className="absolute inset-0 opacity-[0.05]"
         style={{
@@ -146,7 +150,6 @@ function IntroScreen({ onComplete }) {
         }}
       />
 
-      {/* orbiting balls */}
       <div className="relative w-0 h-0 flex items-center justify-center">
         {INTRO_BALLS.map((b, i) => {
           const pos = positions[i];
@@ -174,7 +177,6 @@ function IntroScreen({ onComplete }) {
           );
         })}
 
-        {/* convergence glow, just before blast */}
         <div
           className="absolute rounded-full -ml-6 -mt-6"
           style={{
@@ -188,7 +190,6 @@ function IntroScreen({ onComplete }) {
           }}
         />
 
-        {/* the blast */}
         <div
           className="absolute rounded-full"
           style={{
@@ -334,6 +335,24 @@ export default function Portfolio() {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [formStatus, setFormStatus] = useState("idle"); // idle | sending | sent | error
 
+  const [isCallTime, setIsCallTime] = useState(true);
+
+  useEffect(() => {
+    const checkTime = () => {
+      const hourStr = new Intl.DateTimeFormat("en-US", {
+        timeZone: "Asia/Dhaka",
+        hour: "numeric",
+        hour12: false,
+      }).format(new Date());
+      const hour = parseInt(hourStr, 10); // 0-23, Bangladesh local hour
+      const blocked = hour >= 0 && hour < 10;
+      setIsCallTime(!blocked);
+    };
+    checkTime();
+    const interval = setInterval(checkTime, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -369,6 +388,7 @@ export default function Portfolio() {
     "$ cat mission.txt",
     "> Building fast, clean full-stack apps — and shipping them.",
   ];
+
   const { out, done } = useTypewriter(bootLines, 32, 550, siteRevealed);
 
   const navLink = "text-sm tracking-wide transition-colors";
@@ -384,7 +404,6 @@ export default function Portfolio() {
 
   const handleIntroComplete = useCallback(() => {
     setShowIntro(false);
-    // trigger site fade-in on the next frame
     requestAnimationFrame(() => setSiteRevealed(true));
   }, []);
 
@@ -462,7 +481,7 @@ export default function Portfolio() {
         </header>
 
         {/* HERO */}
-        < section className="max-w-5xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32" >
+        <section className="max-w-5xl mx-auto px-6 pt-20 pb-24 md:pt-28 md:pb-32">
 
           <div
             className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full"
@@ -474,6 +493,7 @@ export default function Portfolio() {
                 style={{ background: COLORS.accent, animation: "pulse-dot 2s ease-in-out infinite" }}
               />
             </span>
+
             <span
               className="text-xs"
               style={{ fontFamily: "'IBM Plex Mono', monospace", color: COLORS.muted }}
@@ -531,6 +551,7 @@ export default function Portfolio() {
               MERN stack developer from Feni, Bangladesh. React on the front,
               Node on the back, and a habit of actually deploying what I build.
             </p>
+
             <div className="mt-8 flex flex-wrap gap-4">
               <div className="relative rounded-md p-[2.5px] overflow-hidden">
                 <div
@@ -570,12 +591,11 @@ export default function Portfolio() {
                 </a>
               </div>
             </div>
-          </Reveal >
-        </section >
+          </Reveal>
+        </section>
 
         {/* SKILLS */}
-        < section id="skills" className="scroll-mt-24 max-w-5xl mx-auto px-6 py-20 border-t" style={{ borderColor: COLORS.line }
-        }>
+        <section id="skills" className="scroll-mt-24 max-w-5xl mx-auto px-6 py-20 border-t" style={{ borderColor: COLORS.line }}>
           <Reveal>
             <div className="flex items-baseline gap-3 mb-10">
               <span style={{ fontFamily: "'IBM Plex Mono', monospace", color: COLORS.mutedDim }} className="text-sm">
@@ -590,7 +610,6 @@ export default function Portfolio() {
           <div className="flex flex-col sm:flex-row sm:flex-wrap items-stretch sm:items-start gap-5 sm:gap-6">
             {Object.entries(SKILLS).map(([category, items], idx) => (
               <Reveal key={category} delay={idx * 120}>
-
                 <div
                   style={{
                     background: COLORS.surface,
@@ -618,10 +637,10 @@ export default function Portfolio() {
               </Reveal>
             ))}
           </div>
-        </section >
+        </section>
 
         {/* PROJECTS */}
-        < section id="work" className="max-w-5xl scroll-mt-24 mx-auto px-6 py-20 border-t" style={{ borderColor: COLORS.line }}>
+        <section id="work" className="max-w-5xl scroll-mt-24 mx-auto px-6 py-20 border-t" style={{ borderColor: COLORS.line }}>
           <Reveal>
             <div className="flex items-baseline gap-3 mb-12">
               <span style={{ fontFamily: "'IBM Plex Mono', monospace", color: COLORS.mutedDim }} className="text-sm">
@@ -680,19 +699,20 @@ export default function Portfolio() {
                           alt={`${p.name} screenshot`}
                           className="w-full h-auto block"
                           loading="lazy"
+                          style={{ background: COLORS.surfaceAlt }}
                         />
                       </div>
                       <p className="text-sm md:text-base max-w-xl mb-4" style={{ color: COLORS.muted }}>
                         {p.desc}
                       </p>
                       <div className="flex flex-wrap gap-2 mb-5">
-                        {p.tags.map((t) => (
+                        {p.tags.map((tag) => (
                           <span
-                            key={t}
+                            key={tag}
                             style={{ border: `1px solid ${COLORS.line}`, color: COLORS.muted, fontFamily: "'IBM Plex Mono', monospace" }}
                             className="text-xs px-2.5 py-1 rounded"
                           >
-                            {t}
+                            {tag}
                           </span>
                         ))}
                       </div>
@@ -713,10 +733,10 @@ export default function Portfolio() {
               })}
             </div>
           </div>
-        </section >
+        </section>
 
         {/* CONTACT */}
-        < section id="contact" className="max-w-5xl scroll-mt-24 mx-auto px-6 py-24 border-t" style={{ borderColor: COLORS.line }}>
+        <section id="contact" className="max-w-5xl scroll-mt-24 mx-auto px-6 py-24 border-t" style={{ borderColor: COLORS.line }}>
           <Reveal>
             <div
               style={{ background: COLORS.surface, border: `1px solid ${COLORS.line}` }}
@@ -738,6 +758,24 @@ export default function Portfolio() {
                 >
                   <Mail size={16} /> tasnimafsar123@gmail.com
                 </a>
+
+                {isCallTime ? (
+                  <a
+                    href="tel:+8801585045382"
+                    style={{ border: `1px solid ${COLORS.line}`, color: COLORS.paper }}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-md text-sm font-medium hover:border-[#45C7A6] transition-colors"
+                  >
+                    <Phone size={16} /> Call me
+                  </a>
+                ) : (
+                  <div
+                    style={{ border: `1px solid ${COLORS.line}`, color: COLORS.mutedDim }}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-md text-sm font-medium cursor-not-allowed opacity-50"
+                    title="Available 10 AM – 12 AM (Bangladesh Time, GMT+6)"
+                  >
+                    <Phone size={16} /> Call me (10 AM–12 AM BDT)
+                  </div>
+                )}
 
                 <a
                   href="/Tasnim_Afsar_Resume.pdf"
@@ -800,7 +838,7 @@ export default function Portfolio() {
                 )}
               </form>
             </div>
-          </Reveal>
+          </Reveal >
         </section >
 
         <footer className="max-w-5xl mx-auto px-6 pb-10 text-center text-xs" style={{ color: COLORS.mutedDim }}>
